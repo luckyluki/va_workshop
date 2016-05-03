@@ -1,0 +1,6 @@
+---
+- name: Do something
+  hosts: web
+  become: True
+  roles:
+    - samba_share
