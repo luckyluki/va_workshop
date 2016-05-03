@@ -3,3 +3,4 @@ admin_user: admin
 packages:
   - {name: 'httpd', state: 'absent'}
   - {name: 'tomcat', state: 'present'}
+  - {name: 'samba', state: 'present'}
