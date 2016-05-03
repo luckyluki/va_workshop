@@ -1,0 +1,9 @@
+admin_user: admin
+
+packages:
+  - {name: 'httpd', state: 'absent'}
+  - {name: 'tomcat', state: 'present'}
+
+samba_share_name: my_share
+samba_share_path: /media/share
+samba_share_group: smbusers
