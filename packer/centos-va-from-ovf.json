@@ -1,73 +1,55 @@
 {
   "variables": {
     "ssh_username": "root",
-    "ssh_password": "#centos!",
-    "vm_hw_disk_size": "131072",
-    "vm_hw_ram_size": "2048",
-    "vm_hw_vram_size": "32",
-    "vm_hw_cpu_count": "2",
-    "vm_networking_type": "nat",
-    "vm_networking_nat_portforwarding": "guestssh,tcp,127.0.0.1,10022,,22"
+    "ssh_password": "123centos?",
+    "ansible_user": "ansible",
+    "ansible_user_pw": "#ansible!",
+    "ansible_public_key": "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA0qdNpyARH8wVF4iAoQyDkj8yZ6CrtHwdEXH9KBOSRmPudbDiTqzx7JsL/s659UPc7pP38EaF8GYNPdTBdcMq7r0tcCaaoSq0I/GceyckQ6/ryjG31hOWB2rkz1f49GSc29o5EySbNlX4xKGDxtgX/AOBLWGuwz/9vaX5jHy0vXY+FkNYTFXxkk+Q4drd0KSa8/MCzK509v4h1HcLLINJLNh7u4UO7rgwhQsjAOOQP0g1v2RrcbfJ3O0+mrO39ASENjEM8t8pW1DmKorDCUZMWORghs1rQUuKwlbr7TRmwbvoVssvAqYAXr6OLkwQVc54NbjynPik25HU6/eBSrsNvw== mkokott@CE03910"
   },
   "builders": [
     {
-      "type": "virtualbox-iso",
-      "boot_command": [
-        "<esc>  vmlinuz initrd=initrd.img inst.stage2=hd:LABEL=CentOS\\x207\\x20x86_64 quiet text ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/kickstart.cfg<enter><wait>"
-      ],
-      "boot_wait": "10s",
-      "guest_os_type": "RedHat_64",
+      "type": "virtualbox-ovf",
+      "source_path": "./output_ex1/wks-vm.ovf",
       "headless": false,
-      "http_directory": "./os",
-      "iso_urls": [
-        "./os/CentOS-7-x86_64-DVD-1511.iso",
-        "http://ftp.plusline.de/centos/7/isos/x86_64/CentOS-7-x86_64-DVD-1511.iso"
-      ],
-      "iso_checksum_type": "md5",
-      "iso_checksum": "c875b0f1dabda14f00a3e261d241f63e",
+      "format": "ovf",
+      "output_directory": "./output_ex2",
+      "shutdown_command": "/sbin/halt -h -p",
+      "guest_additions_mode": "disable",
+      "vm_name": "wks-ansible-vm",
+      "communicator": "ssh",
       "ssh_username": "{{user `ssh_username`}}",
       "ssh_password": "{{user `ssh_password`}}",
       "ssh_port": 10022,
-      "ssh_skip_nat_mapping": true,
-      "ssh_wait_timeout": "45m",
-      "shutdown_command": "/sbin/halt -h -p",
-      "guest_additions_mode": "disable",
-      "format": "ovf",
-      "output_directory": "./output",
-      "vm_name": "wks-vm",
-      "disk_size": "{{user `vm_hw_disk_size`}}",
-      "vboxmanage": [
-        [
-          "modifyvm",
-          "{{.Name}}",
-          "--memory",
-          "{{user `vm_hw_ram_size`}}"
-        ],
-        [
-          "modifyvm",
-          "{{.Name}}",
-          "--vram",
-          "{{user `vm_hw_vram_size`}}"
-        ],
-        [
-          "modifyvm",
-          "{{.Name}}",
-          "--cpus",
-          "{{user `vm_hw_cpu_count`}}"
-        ],
-        [
-          "modifyvm",
-          "{{.Name}}",
-          "--nic1",
-          "{{user `vm_networking_type`}}"
-        ],
-        [
-          "modifyvm",
-          "{{.Name}}",
-          "--natpf1",
-          "{{user `vm_networking_nat_portforwarding`}}"
+      "ssh_timeout": "15m",
+      "ssh_skip_nat_mapping": true
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "inline": [
+        "yum install -y epel-release", 
+        "yum install -y ansible"
         ]
+    },
+    {
+      "type": "file",
+      "source": "./files/packer-was-here",
+      "destination": "/packer-was-here"
+    },
+    {
+      "type": "shell",
+      "script": "./files/setup-ansible-user.sh",
+      "environment_vars": [
+          "ANSIBLE_USER={{user `ansible_user`}}",
+          "ANSIBLE_PW={{user `ansible_user_pw`}}",
+          "ANSIBLE_PUBKEY={{user `ansible_public_key`}}"
       ]
+    },
+    {
+      "type": "file",
+      "source": "./files/keys/",
+      "destination": "/home/{{user `ansible_user`}}/.ssh"
     }
   ]
 }
