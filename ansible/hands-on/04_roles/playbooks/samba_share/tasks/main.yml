@@ -1,0 +1,18 @@
+---
+- name: install samba
+  yum: >
+    name=samba
+    state=present
+- name: creating samba share folder
+  file: >
+    name={{ samba_share_path }}
+    state=directory
+- name: deploying samba config
+  template: >
+    src=smb.conf.j2 
+    dest=/etc/samba/smb.conf 
+    backup=yes
+- name: restarting samba
+  service: >
+    name=smb 
+    state=restarted
