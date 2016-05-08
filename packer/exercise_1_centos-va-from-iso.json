@@ -6,7 +6,6 @@
     "vm_hw_ram_size": "2048",
     "vm_hw_vram_size": "32",
     "vm_hw_cpu_count": "2",
-    "vm_ssh_port": "10022",
     "vm_networking_type": "nat",
     "vm_networking_nat_portforwarding": "guestssh,tcp,127.0.0.1,10022,,22"
   },
@@ -28,7 +27,7 @@
       "iso_checksum": "c875b0f1dabda14f00a3e261d241f63e",
       "ssh_username": "{{user `ssh_username`}}",
       "ssh_password": "{{user `ssh_password`}}",
-      "ssh_port": "{{user `vm_ssh_port`}}",
+      "ssh_port": 10022,
       "ssh_skip_nat_mapping": true,
       "ssh_wait_timeout": "15m",
       "shutdown_command": "/sbin/halt -h -p",
